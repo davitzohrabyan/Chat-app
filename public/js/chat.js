@@ -15,6 +15,8 @@ const locationTemplate = document.querySelector('#location-template')
 const sidebarTemplate = document.querySelector('#sidebar-template')
     .innerHTML;
 
+const typingTemplate = document.querySelector('#typing-template')
+
 
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
@@ -48,6 +50,8 @@ socket.on('message', message => {
     autoscroll();
 });
 
+
+
 socket.on('locationMessage', locMessage => {
     console.log(locMessage);
     const html = Mustache.render(locationTemplate, {
@@ -67,9 +71,19 @@ socket.on('roomData', ({ room, users }) => {
     document.querySelector('#sidebar').innerHTML = html;
 });
 
+socket.on('#typingMessage', ({ message }) => {
+    console.log(message)
+    const html = Mustache.render(typingTemplate, {
+        message
+    })
+    console.log(document.querySelector('#typing-message'))
+    document.querySelector('#typing-message').innerHTML = html
+})
+
 $messageForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    e.preventDefault();
     $messageFormButton.setAttribute('disabled', 'disabled');
+
 
         const message = e.target.elements.message.value;
 
@@ -81,8 +95,16 @@ $messageForm.addEventListener('submit', (e) => {
                 return console.log(error);
             }
             console.log('Message delivered');
-        });
-        });
+    });
+});
+
+$messageForm.addEventListener('input', (e) => {
+    socket.emit('userTyping', error => {
+        if (error) {
+            return console.log(error)
+        }
+    })
+})
 
 $sendLocation.addEventListener('click', () => {
     if (!navigator.geolocation) {

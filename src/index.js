@@ -65,6 +65,16 @@ io.on('connection', (socket) => {
         callback();
     });
 
+    socket.on('userTyping', (message, callback) => {
+        const user = getUser(socket.id);
+        if(!message) {
+            return callback();
+        }
+        socket.broadcast.to(user.room).emit('typingMessage', {
+            message: `${user} is typing...`
+        })
+    })
+
     socket.on('sendLocation', (coords, callback) => {
         const user = getUser(socket.id);
         io.to(user.room).emit('locationMessage', generateLocationMessage(user.username,`https://google.com/maps?q=${coords.latitude},${coords.longitude}`));

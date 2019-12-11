@@ -16,7 +16,7 @@
         Chat App
     </title>
     <link rel="icon" href="/img/favicon.png">
-    <link rel="stylesheet" href="/css/styles.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
@@ -25,18 +25,34 @@
 
     </div>
     <div class="chat__main">
+
+
         <div id="messages" class="chat__messages"></div>
-        <div class="compose">
-            <form id="message-form">
-                <input name="message" placeholder="Message" required autocomplete="off">
-                <button>Send</button>
-            </form>
-            <button id="send-location">Send location</button>
-        </div>
+       <div class="bottom-side">
+           <div class="typing-template">
+               dsfzdvczsd
+           </div>
+           <div class="compose">
+
+               <form id="message-form">
+                   <input name="message" placeholder="Message" required autocomplete="off">
+                   <button>Send</button>
+               </form>
+               <button id="send-location">Send location</button>
+           </div>
+       </div>
 
     </div>
 
 </div>
+
+<!--<script id="typing-template" type="text/html">-->
+<!--    <div class="bottom-side">-->
+<!--        <div class="typing-template">-->
+<!--            dsfzdvczsd {{message}}-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</script>-->
 
 <script id="message-template" type="text/html">
     <div class="message">
