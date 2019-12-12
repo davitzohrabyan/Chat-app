@@ -15,10 +15,13 @@ const locationTemplate = document.querySelector('#location-template')
 const sidebarTemplate = document.querySelector('#sidebar-template')
     .innerHTML;
 
-const typingTemplate = document.querySelector('#typing-template')
+const typingTemplate = document.querySelector('#typing-message')
+    .innerHTML;
 
 
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
+
+let timer;
 
 const autoscroll = () => {
     const $newMessage = $messages.lastElementChild;
@@ -38,9 +41,9 @@ const autoscroll = () => {
     }
 };
 
-
 socket.on('message', message => {
-    console.log(message);
+    clearTimeout(timer)
+    // console.log(message);
     const html = Mustache.render(messageTemplate, {
         username: message.username,
         message: message.text,
@@ -51,9 +54,8 @@ socket.on('message', message => {
 });
 
 
-
 socket.on('locationMessage', locMessage => {
-    console.log(locMessage);
+    // console.log(locMessage);
     const html = Mustache.render(locationTemplate, {
         username: locMessage.username,
         location: locMessage.url,
@@ -71,12 +73,19 @@ socket.on('roomData', ({ room, users }) => {
     document.querySelector('#sidebar').innerHTML = html;
 });
 
-socket.on('#typingMessage', ({ message }) => {
-    console.log(message)
+socket.on('typingMessage', async ({ message }) => {
+    // console.log(message)
+    const html = await Mustache.render(typingTemplate, {
+        message
+    });
+    document.querySelector('#typing-message').innerHTML = html
+})
+
+socket.on('stopMessage', ({ message }) => {
+    // console.log(message);
     const html = Mustache.render(typingTemplate, {
         message
-    })
-    console.log(document.querySelector('#typing-message'))
+    });
     document.querySelector('#typing-message').innerHTML = html
 })
 
@@ -84,9 +93,10 @@ $messageForm.addEventListener('submit', (e) => {
     e.preventDefault();
     $messageFormButton.setAttribute('disabled', 'disabled');
 
-
         const message = e.target.elements.message.value;
-
+        socket.emit('stopTyping', error => {
+            return console.log(error)
+        })
         socket.emit('sendMessage', message, (error) => {
             $messageFormButton.removeAttribute('disabled');
             $messageFormInput.value = '';
@@ -94,16 +104,22 @@ $messageForm.addEventListener('submit', (e) => {
             if (error) {
                 return console.log(error);
             }
-            console.log('Message delivered');
+            // console.log('Message delivered');
     });
 });
 
 $messageForm.addEventListener('input', (e) => {
+    clearTimeout(timer)
     socket.emit('userTyping', error => {
         if (error) {
             return console.log(error)
         }
     })
+    timer = setTimeout(() => {
+        socket.emit('stopTyping', error => {
+            return console.log(error)
+        })
+    }, 3000)
 })
 
 $sendLocation.addEventListener('click', () => {

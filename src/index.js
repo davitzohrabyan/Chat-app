@@ -24,10 +24,14 @@ const publicDirectoryPath = path.join(__dirname, '../public');
 
 app.use(express.static(publicDirectoryPath));
 
+
 let count = 0;
 
 io.on('connection', (socket) => {
-    console.log('New WebSocket connection');
+    console.log('SocketIO connection');
+    socket.emit('stopMessage', {
+        message: ''
+    })
 
     socket.on('join', ({ username, room }, callback) => {
         const { error, user } = addUser({ id: socket.id, username, room });
@@ -65,13 +69,23 @@ io.on('connection', (socket) => {
         callback();
     });
 
-    socket.on('userTyping', (message, callback) => {
+    socket.on('userTyping', async (message, callback) => {
         const user = getUser(socket.id);
         if(!message) {
             return callback();
         }
         socket.broadcast.to(user.room).emit('typingMessage', {
-            message: `${user} is typing...`
+            message: `${user.username} is typing...`
+        });
+    })
+
+    socket.on('stopTyping', async (message, callback) => {
+        const user = getUser(socket.id);
+        if(!message) {
+            return callback();
+        }
+        socket.broadcast.to(user.room).emit('stopMessage', {
+            message: ''
         })
     })
 
@@ -93,7 +107,6 @@ io.on('connection', (socket) => {
         }
     });
 });
-
 
 
 server.listen(port, () => {
