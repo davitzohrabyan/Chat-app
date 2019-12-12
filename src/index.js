@@ -24,14 +24,10 @@ const publicDirectoryPath = path.join(__dirname, '../public');
 
 app.use(express.static(publicDirectoryPath));
 
-
-let count = 0;
-
 io.on('connection', (socket) => {
-    console.log('SocketIO connection');
     socket.emit('stopMessage', {
         message: ''
-    })
+    });
 
     socket.on('join', ({ username, room }, callback) => {
         const { error, user } = addUser({ id: socket.id, username, room });
@@ -48,10 +44,8 @@ io.on('connection', (socket) => {
             room: user.room,
             users: getUsersInRoom(user.room)
         });
-
         callback();
     });
-
 
     socket.on('sendMessage', (message, callback) => {
 
@@ -77,7 +71,7 @@ io.on('connection', (socket) => {
         socket.broadcast.to(user.room).emit('typingMessage', {
             message: `${user.username} is typing...`
         });
-    })
+    });
 
     socket.on('stopTyping', async (message, callback) => {
         const user = getUser(socket.id);
@@ -87,7 +81,7 @@ io.on('connection', (socket) => {
         socket.broadcast.to(user.room).emit('stopMessage', {
             message: ''
         })
-    })
+    });
 
     socket.on('sendLocation', (coords, callback) => {
         const user = getUser(socket.id);
@@ -108,10 +102,7 @@ io.on('connection', (socket) => {
     });
 });
 
-
-server.listen(port, () => {
-    console.log('Server is up on port ' + port);
-});
+server.listen(port);
 
 
 

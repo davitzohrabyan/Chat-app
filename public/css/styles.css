@@ -137,6 +137,7 @@ button:disabled {
 .typing-template {
     padding: 0 0 0 24px;
     color: #75758b;
+    font-style: italic;
 }
 .compose {
     display: flex;
